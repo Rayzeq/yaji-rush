@@ -8,4 +8,4 @@ class Title(pygame.sprite.Sprite):
 
 	def __init__(self, screen):
 		super().__init__()
-		self.image = pygame.image.load(get_file('assets\\flash.png')).convert_alpha()
+		self.image = pygame.image.load(get_file('assets/flash.png')).convert_alpha()

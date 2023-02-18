@@ -9,8 +9,8 @@ class Title(pygame.sprite.Sprite):
 	def __init__(self, screen):
 		super().__init__()
 		self.screen = screen
-		self.image = pygame.image.load(get_file('assets\\title.png'))
-		self.image_rotated = pygame.image.load(get_file('assets\\title.png'))
+		self.image = pygame.image.load(get_file('assets/title.png'))
+		self.image_rotated = pygame.image.load(get_file('assets/title.png'))
 		# self.image = pygame.transform.rotate(self.image, -30)
 		self.rect = self.image.get_rect()
 		self.rect.x = 0
@@ -41,9 +41,9 @@ class Cog(pygame.sprite.Sprite):
 	def __init__(self, screen, x, y):
 		super().__init__()
 		self.screen = screen
-		self.image = pygame.image.load(get_file('assets\\cog.png'))
+		self.image = pygame.image.load(get_file('assets/cog.png'))
 		self.image = self.image = pygame.transform.scale(self.image, (576, 576))
-		self.image_rotated = pygame.image.load(get_file('assets\\cog.png'))
+		self.image_rotated = pygame.image.load(get_file('assets/cog.png'))
 		self.rect = self.image.get_rect()
 		self.rect.x = x
 		self.rect.y = y

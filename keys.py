@@ -12,16 +12,16 @@ class Keys(pygame.sprite.Sprite):
         self.game = game
         self.j=j
         if self.n == 1:
-            self.image = pygame.image.load(get_file('assets\\q2.png'))
+            self.image = pygame.image.load(get_file('assets/q2.png'))
             self.k = "q"
         if self.n == 2:
-            self.image = pygame.image.load(get_file('assets\\z2.png'))
+            self.image = pygame.image.load(get_file('assets/z2.png'))
             self.k = "z"
         if self.n == 3:
-            self.image = pygame.image.load(get_file('assets\\s2.png'))
+            self.image = pygame.image.load(get_file('assets/s2.png'))
             self.k = "s"
         if self.n == 4:
-            self.image = pygame.image.load(get_file('assets\\d2.png'))
+            self.image = pygame.image.load(get_file('assets/d2.png'))
             self.k = "d"
         self.image = pygame.transform.scale(self.image, (48, 48))
         self.rect = self.image.get_rect()
