@@ -117,13 +117,13 @@ while running:
     elif game.phase == 'title':
         screen.blit(bgSet, (0, 0))
         cog4.animate()
-        if title_animation < 60:
+        if title_animation < 60*2:
             title_animation += 1
-            title_angle += 1
+            title_angle += 0.5
         else:
             title_animation += 1
-            title_angle -= 1
-            if title_animation >= 120:
+            title_angle -= 0.5
+            if title_animation >= 120*2:
                 title_animation = 0
         title.blitRotateCenter(screen, title.image,
                                (title.rect.x, title.rect.y), title_angle)

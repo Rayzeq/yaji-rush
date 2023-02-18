@@ -62,7 +62,7 @@ class Cog(pygame.sprite.Sprite):
     def animate(self):
         self.blitRotateCenter(self.screen, self.image,
                               (self.rect.x, self.rect.y), self.angle)
-        self.angle += 1
+        self.angle += 0.4
 
     def blitRotateCenter(self, surf, image, topleft, angle):
 
