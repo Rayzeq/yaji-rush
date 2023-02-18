@@ -1,9 +1,6 @@
 import pygame
-from os import path
 
-
-def get_file(name):
-    return path.join(path.dirname(path.realpath(__file__)), name)
+from assets import Assets
 
 
 class Arrow(pygame.sprite.Sprite):
@@ -14,13 +11,13 @@ class Arrow(pygame.sprite.Sprite):
         self.j = j
         self.game = game
         if self.n == 'q':
-            self.image = pygame.image.load(get_file('assets/q.png'))
+            self.image = Assets.image.q
         if self.n == 'z':
-            self.image = pygame.image.load(get_file('assets/z.png'))
+            self.image = Assets.image.z
         if self.n == 'd':
-            self.image = pygame.image.load(get_file('assets/d.png'))
+            self.image = Assets.image.d
         if self.n == 's':
-            self.image = pygame.image.load(get_file('assets/s.png'))
+            self.image = Assets.image.s
         self.rect = self.image.get_rect()
         self.rect.x = x
         self.rect.y = y
@@ -31,29 +28,29 @@ class Arrow(pygame.sprite.Sprite):
     def pressed(self):
         self.is_pressed = True
         if self.n == 'q':
-            self.image = pygame.image.load(get_file('assets/q2.png'))
+            self.image = Assets.image.q2
             self.image = pygame.transform.scale(self.image, (48, 48))
         if self.n == 'z':
-            self.image = pygame.image.load(get_file('assets/z2.png'))
+            self.image = Assets.image.z2
             self.image = pygame.transform.scale(self.image, (48, 48))
         if self.n == 'd':
-            self.image = pygame.image.load(get_file('assets/d2.png'))
+            self.image = Assets.image.d2
             self.image = pygame.transform.scale(self.image, (48, 48))
         if self.n == 's':
-            self.image = pygame.image.load(get_file('assets/s2.png'))
+            self.image = Assets.image.s2
             self.image = pygame.transform.scale(self.image, (48, 48))
 
     def unpressed(self):
         self.is_pressed = False
         if self.n == 'q':
-            self.image = pygame.image.load(get_file('assets/q.png'))
+            self.image = Assets.image.q
             self.image = pygame.transform.scale(self.image, (48, 48))
         if self.n == 'z':
-            self.image = pygame.image.load(get_file('assets/z.png'))
+            self.image = Assets.image.z
             self.image = pygame.transform.scale(self.image, (48, 48))
         if self.n == 'd':
-            self.image = pygame.image.load(get_file('assets/d.png'))
+            self.image = Assets.image.d
             self.image = pygame.transform.scale(self.image, (48, 48))
         if self.n == 's':
-            self.image = pygame.image.load(get_file('assets/s.png'))
+            self.image = Assets.image.s
             self.image = pygame.transform.scale(self.image, (48, 48))

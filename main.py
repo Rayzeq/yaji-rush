@@ -2,11 +2,13 @@
 
 import pygame
 from game import Game
-from button import Button
+from widgets import OldButton, Button, CheckButton, ListButton, Header
 from button_set import Button_set
 from title import Title
 from title import Cog
 from os import path
+
+from assets import Assets
 
 pygame.init()
 
@@ -22,15 +24,19 @@ screen = pygame.display.set_mode((576, 576))
 font = pygame.font.SysFont(None, 25)
 font_won = pygame.font.SysFont(None, 50)
 
-bg1p = pygame.image.load(get_file('assets/bg_1p.png'))
-bg1pTime = pygame.image.load(get_file('assets/bg_1pTime.png'))
-bg2p = pygame.image.load(get_file('assets/bg_2p.png'))
-bg2pTime = pygame.image.load(get_file('assets/bg_2pTime.png'))
-bg_go_1p = pygame.image.load(get_file('assets/bg_go_1p.png'))
-bg_go_2p = pygame.image.load(get_file('assets/bg_go_2p.png'))
+bg1p = Assets.image.bg_1p
+bg1pTime = Assets.image.bg_1pTime
+bg2p = Assets.image.bg_2p
+bg2pTime = Assets.image.bg_2pTime
+bg_go_1p = Assets.image.bg_go_1p
+bg_go_2p = Assets.image.bg_go_2p
 
-bgSet = pygame.image.load(get_file('assets/bg_test.png'))
-bg_hs = pygame.image.load(get_file('assets/bg_hs.png'))
+bgSet = Assets.image.background
+bg_hs = Assets.image.bg_hs
+
+head_1p = Header(144, 50, "1 player")
+head_ctrl = Header(144, 50, "Controls")
+head_set = Header(144, 50, "Settings")
 
 title = Title(screen)
 title_animation = 0
@@ -44,39 +50,42 @@ cog5 = Cog(screen, -288, -288)
 cog6 = Cog(screen, -288, 288)
 cog7 = Cog(screen, 0, 0)
 
-buttons_title = Button_set(Button('assets/btn_1p.png', -10, 275), 'menu')
-buttons_title.add('assets/btn_2p.png')
-buttons_title.add('assets/btn_set.png')
-buttons_title.add('assets/btn_quit.png')
+buttons_title = Button_set(
+    Button(-10, 275, "1 player"), 'menu')
+buttons_title.add("2 players")
+buttons_title.add("Settings")
+buttons_title.add("Quit")
 
-buttons_1p = Button_set(Button('assets/btn_time.png', -50, 110), 'menu')
-buttons_1p.add('assets/btn_score.png')
-buttons_1p.add('assets/btn_vie.png')
-buttons_1p.add('assets/btn_custom.png')
-buttons_1p.add('assets/btn_high-score.png')
-buttons_1p.add('assets/btn_back.png')
+buttons_1p = Button_set(Button(-50, 110, "Time"), 'menu')
+buttons_1p.add("Score")
+buttons_1p.add("Lives")
+buttons_1p.add("Custom")
+buttons_1p.add("High score")
+buttons_1p.add("Back")
 
-buttons_set = Button_set(Button('assets/btn_time.png', -100, 200), 'menu')
-buttons_set.add('assets/btn_score.png')
-buttons_set.add('assets/btn_vie.png')
-buttons_set.add('assets/btn_control.png')
-buttons_set.add('assets/btn_back.png')
+buttons_set = Button_set(
+    CheckButton(-100, 200, "Time"), 'menu')
+buttons_set.add_check("Score")
+buttons_set.add_check("Lives")
+buttons_set.add("Controls")
+buttons_set.add("Back")
 
-buttons_set2 = Button_set(Button('assets/btn_time_1.png', 288, 200), 'menu')
-buttons_set2.add('assets/btn_scor_1.png')
-buttons_set2.add('assets/btn_vies_1.png')
+buttons_set2 = Button_set(
+    ListButton(288, 200, {"10s": 10000, "30s": 30000, "60s": 60000}), 'menu')
+buttons_set2.add_list({"500": 500, "1000": 1000, "2000": 2000})
+buttons_set2.add_list({"3": 3, "5": 5, "10": 10})
 
-buttons_key = Button_set(Button('assets/btn_k_q.png', 0, 200), 'key')
-buttons_key.add('assets/btn_k_z.png')
-buttons_key.add('assets/btn_k_s.png')
-buttons_key.add('assets/btn_k_d.png')
+buttons_key = Button_set(OldButton("btn_k_q", 0, 200), 'key')
+buttons_key.old_add("btn_k_z")
+buttons_key.old_add("btn_k_s")
+buttons_key.old_add("btn_k_d")
 
-buttons_key2 = Button_set(Button('assets/btn_k_q.png', 0, 354), 'key')
-buttons_key2.add('assets/btn_k_z.png')
-buttons_key2.add('assets/btn_k_s.png')
-buttons_key2.add('assets/btn_k_d.png')
+buttons_key2 = Button_set(OldButton("btn_k_q", 0, 354), 'key')
+buttons_key2.old_add("btn_k_z")
+buttons_key2.old_add("btn_k_s")
+buttons_key2.old_add("btn_k_d")
 
-btn_back_ctrl = Button('assets/btn_back.png', -50, 500)
+btn_back_ctrl = Button(-50, 500, "Back")
 
 cursor = 0
 cur1p = -1
@@ -85,8 +94,8 @@ curctrl = [-1, 0]
 
 key_selected = False
 
-game = Game(screen, {0: buttons_set.buttons[0].is_int,
-                     1: buttons_set.buttons[1].is_int, 2: buttons_set.buttons[2].is_int})
+game = Game(screen, {0: buttons_set.buttons[0].checked,
+                     1: buttons_set.buttons[1].checked, 2: buttons_set.buttons[2].checked})
 
 running = True
 
@@ -120,7 +129,7 @@ while running:
                                (title.rect.x, title.rect.y), title_angle)
 
         for button in buttons_title.buttons:
-            screen.blit(button.image, button.rect)
+            button.draw(screen)
         if cursor == 0:
             game.mode = '1p'
 
@@ -135,10 +144,9 @@ while running:
         cog4.animate()
         cog5.animate()
         cog6.animate()
-        screen.blit(pygame.image.load(
-            get_file('assets/head_1p.png')), (144, 50))
+        head_1p.draw(screen)
         for button in buttons_1p.buttons:
-            screen.blit(button.image, button.rect)
+            button.draw(screen)
         if cur1p != -1:
             buttons_1p.select(cur1p)
         else:
@@ -165,19 +173,17 @@ while running:
         screen.blit(bgSet, (0, 0))
         cog.animate()
         cog2.animate()
-        screen.blit(pygame.image.load(
-            get_file('assets/head_set.png')), (144, 50))
+        head_set.draw(screen)
 
         for button in buttons_set.buttons:
-            screen.blit(button.image, button.rect)
+            button.draw(screen)
         if curset[1] == 0 or curset[0] > 2:
             buttons_set2.unselect()
             buttons_set.select(curset[0])
 
         for i in range(len(buttons_set2.buttons)):
             if game.gameplan[i]:
-                screen.blit(
-                    buttons_set2.buttons[i].image, buttons_set2.buttons[i].rect)
+                buttons_set2.buttons[i].draw(screen)
         if curset[1] == 1 and curset[0] < 3:
             buttons_set.unselect()
             buttons_set2.select(curset[0])
@@ -190,15 +196,12 @@ while running:
         cog.animate()
         cog2.animate()
 
-        screen.blit(pygame.image.load(
-            get_file('assets/head_ctrl.png')), (144, 50))
+        head_ctrl.draw(screen)
 
-        screen.blit(pygame.image.load(
-            get_file('assets/layout_ctrl_p1.png')), (0, 152))
-        screen.blit(pygame.image.load(
-            get_file('assets/layout_ctrl_p2.png')), (0, 306))
+        screen.blit(Assets.image.layout_ctrl_p1, (0, 152))
+        screen.blit(Assets.image.layout_ctrl_p2, (0, 306))
 
-        screen.blit(btn_back_ctrl.image, btn_back_ctrl.rect)
+        btn_back_ctrl.draw(screen)
         for button in buttons_key.buttons:
             screen.blit(button.image, button.rect)
 
@@ -211,10 +214,10 @@ while running:
         elif curctrl[0] == 1:
             buttons_key.unselect()
             buttons_key2.select(curctrl[1])
-            btn_back_ctrl.unselected()
+            btn_back_ctrl.deselect()
         elif curctrl[0] == 2:
             buttons_key2.unselect()
-            btn_back_ctrl.selected()
+            btn_back_ctrl.select()
 
         screen.blit(font.render(pygame.key.name(
             game.ctrl_p1['q']), True, (0, 0, 0)), (65, 265))
@@ -346,16 +349,16 @@ while running:
                                 game.phase = 'title'
                                 curset = [-1, 0]
                         elif curset[1] == 0:
-                            if buttons_set.buttons[curset[0]].is_int:
-                                buttons_set.buttons[curset[0]].deint()
+                            if buttons_set.buttons[curset[0]].checked:
+                                buttons_set.buttons[curset[0]].uncheck()
                                 game.gameplan[curset[0]] = False
                             else:
-                                buttons_set.buttons[curset[0]].int()
+                                buttons_set.buttons[curset[0]].check()
                                 game.gameplan[curset[0]] = True
                         elif curset[1] == 1:
                             buttons_set2.buttons[curset[0]].next()
                             game.gameset[curset[0]] = buttons_set2.buttons[curset[0]
-                                                                           ].gameset[curset[0]][buttons_set2.buttons[curset[0]].n-1]
+                                                                           ].value
 
             if game.phase == 'key_set':
                 if event.key == pygame.K_ESCAPE:
@@ -370,7 +373,7 @@ while running:
                     curctrl[1] += 1
                 elif event.key == pygame.K_RETURN:
                     if curctrl[0] == 2:
-                        btn_back_ctrl.unselected()
+                        btn_back_ctrl.deselect()
                         game.phase = 'settings'
                     elif key_selected is False:
                         if curctrl[0] == 0:

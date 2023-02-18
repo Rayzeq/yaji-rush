@@ -4,6 +4,8 @@ from arrow import Arrow
 from keys import Keys
 from os import path
 
+from assets import Assets
+
 
 def get_file(name):
     return path.join(path.dirname(path.realpath(__file__)), name)
@@ -16,7 +18,7 @@ class Game():
         self.screen = screen
         self.font = pygame.font.SysFont(None, 25)
         self.font2 = pygame.font.SysFont(None, 50)
-        self.img_flash = pygame.image.load(get_file('assets/flash.png'))
+        self.img_flash = Assets.image.flash
         self.flashx = 0
         self.startimer_flash = 0
         self.mode = '1p'
