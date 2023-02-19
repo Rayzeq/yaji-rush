@@ -1,11 +1,11 @@
-Yaji-Rush ver 1.0.0
+Yaji-Rush version 1.0.0
 
-pour démarer le jeu :
+Pour démarer le jeu :
 	- Installer Python
 	- Installer Pygame (pour ce faire, taper 'pip install pygame' dans le cmd)
 	- Lancer le fichier 'main.py'
 
-dans le jeu : Les flèches, entrer, et échape sont utiliser pour naviguer dans les menus.
+Dans le jeu : Les flèches, entrer, et échape sont utilisés pour naviguer dans les menus.
 
 
 Made by Mylo

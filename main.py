@@ -2,7 +2,7 @@
 
 import pygame
 from game import Game
-from widgets import OldButton, Button, CheckButton, ListButton, Header
+from widgets import Button, CheckButton, ListButton, Header, ControlButton
 from button_set import Button_set
 from title import Title
 from title import Cog
@@ -24,14 +24,21 @@ screen = pygame.display.set_mode((576, 576))
 font = pygame.font.SysFont(None, 25)
 font_won = pygame.font.SysFont(None, 50)
 
-bg1p = Assets.image.bg_1p
-bg1pTime = Assets.image.bg_1pTime
-bg2p = Assets.image.bg_2p
-bg2pTime = Assets.image.bg_2pTime
-bg_go_1p = Assets.image.bg_go_1p
-bg_go_2p = Assets.image.bg_go_2p
-
 bgSet = Assets.image.background
+
+bg1p = bgSet.copy()
+bg1p.blit(Assets.image.bg_1p, (0, 0))
+bg1pTime = bgSet.copy()
+bg1pTime.blit(Assets.image.bg_1pTime, (0, 0))
+bg2p = bgSet.copy()
+bg2p.blit(Assets.image.bg_2p, (0, 0))
+bg2pTime = bgSet.copy()
+bg2pTime.blit(Assets.image.bg_2pTime, (0, 0))
+bg_go_1p = bgSet.copy()
+bg_go_1p.blit(Assets.image.bg_go_1p, (0, 0))
+bg_go_2p = bgSet.copy()
+bg_go_2p.blit(Assets.image.bg_go_2p, (0, 0))
+
 bg_hs = Assets.image.bg_hs
 
 head_1p = Header(144, 50, "1 player")
@@ -75,15 +82,23 @@ buttons_set2 = Button_set(
 buttons_set2.add_list({"500": 500, "1000": 1000, "2000": 2000})
 buttons_set2.add_list({"3": 3, "5": 5, "10": 10})
 
-buttons_key = Button_set(OldButton("btn_k_q", 0, 200), 'key')
-buttons_key.old_add("btn_k_z")
-buttons_key.old_add("btn_k_s")
-buttons_key.old_add("btn_k_d")
+buttons_key = Button_set(ControlButton(27, 200, Assets.image.template(
+    "arrow_icon", color="#211dde", angle=180)), 'key')
+buttons_key.add_control(Assets.image.template(
+    "arrow_icon", color="#e2cb0e", angle=-90), offsetx=2)
+buttons_key.add_control(Assets.image.template(
+    "arrow_icon", color="#0ee20e", angle=90), offsetx=2)
+buttons_key.add_control(Assets.image.template(
+    "arrow_icon", color="#e20e0e", angle=0), offsetx=5)
 
-buttons_key2 = Button_set(OldButton("btn_k_q", 0, 354), 'key')
-buttons_key2.old_add("btn_k_z")
-buttons_key2.old_add("btn_k_s")
-buttons_key2.old_add("btn_k_d")
+buttons_key2 = Button_set(ControlButton(27, 354, Assets.image.template(
+    "arrow_icon", color="#211dde", angle=180)), 'key')
+buttons_key2.add_control(Assets.image.template(
+    "arrow_icon", color="#e2cb0e", angle=-90), offsetx=2)
+buttons_key2.add_control(Assets.image.template(
+    "arrow_icon", color="#0ee20e", angle=90), offsetx=2)
+buttons_key2.add_control(Assets.image.template(
+    "arrow_icon", color="#e20e0e", angle=0), offsetx=5)
 
 btn_back_ctrl = Button(-50, 500, "Back")
 
@@ -203,10 +218,10 @@ while running:
 
         btn_back_ctrl.draw(screen)
         for button in buttons_key.buttons:
-            screen.blit(button.image, button.rect)
+            button.draw(screen)
 
         for button in buttons_key2.buttons:
-            screen.blit(button.image, button.rect)
+            button.draw(screen)
 
         if curctrl[0] == 0:
             buttons_key2.unselect()
@@ -377,9 +392,9 @@ while running:
                         game.phase = 'settings'
                     elif key_selected is False:
                         if curctrl[0] == 0:
-                            buttons_key.buttons[curctrl[1]].int()
+                            buttons_key.buttons[curctrl[1]].check()
                         elif curctrl[0] == 1:
-                            buttons_key2.buttons[curctrl[1]].int()
+                            buttons_key2.buttons[curctrl[1]].check()
                         key_selected = True
 
             if key_selected and game.phase == 'key_set' and event.key != pygame.K_RETURN:
@@ -401,9 +416,9 @@ while running:
                     game.ctrl_p2['d'] = event.key
 
                 if curctrl[0] == 0:
-                    buttons_key.buttons[curctrl[1]].deint()
+                    buttons_key.buttons[curctrl[1]].uncheck()
                 else:
-                    buttons_key2.buttons[curctrl[1]].deint()
+                    buttons_key2.buttons[curctrl[1]].uncheck()
                 key_selected = False
 
             if game.phase == 'game':

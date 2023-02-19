@@ -1,5 +1,5 @@
 import pygame
-from widgets import OldButton, Button, CheckButton, ListButton
+from widgets import Button, CheckButton, ListButton, ControlButton
 
 
 class Button_set():
@@ -8,14 +8,6 @@ class Button_set():
         self.typ = typ
         self.head = head
         self.buttons = [self.head]
-
-    def old_add(self, img):
-        if self.typ == 'menu':
-            self.buttons.append(
-                OldButton(img, self.head.x, self.head.y + 77 * len(self.buttons)))
-        elif self.typ == 'key':
-            self.buttons.append(
-                OldButton(img, self.head.x + 144 * len(self.buttons), self.head.y))
 
     def add(self, text: str):
         if self.typ == 'menu':
@@ -40,6 +32,14 @@ class Button_set():
         elif self.typ == 'key':
             self.buttons.append(
                 ListButton(self.head.x + 144 * len(self.buttons), self.head.y, texts))
+
+    def add_control(self, image, **kwargs):
+        if self.typ == 'menu':
+            self.buttons.append(
+                ControlButton(self.head.x, self.head.y + 77 * len(self.buttons), image, **kwargs))
+        elif self.typ == 'key':
+            self.buttons.append(
+                ControlButton(self.head.x + 144 * len(self.buttons), self.head.y, image, **kwargs))
 
     def select(self, cursor):
         self.unselect()
