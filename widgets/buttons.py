@@ -1,12 +1,12 @@
-from typing import Dict, Any, List, Tuple
+from __future__ import annotations
+from typing import Dict, Any, List, Optional, Callable
 from abc import abstractmethod
 from functools import partial
 
 import pygame
 
-from assets import Assets
 from . import Widget, Focusable, Clickable, Placeholder
-from .box import Box
+from .box import Box, Side
 from .utils import PropertyMatrix
 
 
@@ -50,6 +50,9 @@ class ButtonBase(Clickable, Focusable, Widget):
     def event(self, event: pygame.event.Event):
         if event.type == pygame.KEYDOWN and event.key == pygame.K_RETURN:
             self.click()
+            return False
+
+        return super().event(event)
 
 
 class Button(ButtonBase):
@@ -57,32 +60,23 @@ class Button(ButtonBase):
         super().__init__(x, y, gen_args=gen_args + [text], **kwargs)
 
     def _generate_image(self, text: str, *, focused: bool) -> pygame.Surface:
-        image = self._build_image(
-            Assets.image.button, text, scale_factor=1.5 if focused else 0.0)
+        image = self._build_image(text, scale_factor=(
+            self.scale_factor + 1) if focused else None)
 
         if not focused:
             self.width, self.height = image.get_size()
 
         return image
 
-    def _build_image(self, base: pygame.Surface, text: str, align: str = "right", scale_factor: float = 0.0) -> pygame.Surface:
-        image = base.copy()
-        text = Assets.font.PrimaSansBold[25].render(
-            text, True, (255, 255, 255))
-
+    @staticmethod
+    def _build_image(text: str, *, scale_factor: Optional[float] = None, checked: bool = False) -> pygame.Surface:
+        image = Box._generate_image(
+            text, side=Side.Left,
+            width=285, enabled=checked
+        )
         img_rect = image.get_rect()
-        txt_rect = text.get_rect()
-        txt_rect.centery = img_rect.centery - 3
-        if align == "right":
-            txt_rect.right = img_rect.right - 45
-        elif align == "center":
-            txt_rect.centerx = img_rect.centerx
-        else:
-            raise ValueError(f"Invalid text alignement: {align}")
 
-        image.blit(text, txt_rect)
-
-        if scale_factor:
+        if scale_factor is not None:
             image = pygame.transform.smoothscale(
                 image, (int(img_rect.width*scale_factor), int(img_rect.height*scale_factor)))
 
@@ -91,15 +85,24 @@ class Button(ButtonBase):
 
 class CheckButton(Button):
     checked: bool = False
+    ontoggle: Optional[Callable[[CheckButton, bool]]] = None
 
-    def __init__(self, x: int, y: int, text: str, *, attributes: Dict[str, List[Any]] = {}, **kwargs):
+    def __init__(
+        self,
+        x: int, y: int, text: str, *,
+        attributes: Dict[str, List[Any]] = {},
+        ontoggle: Optional[Callable[[CheckButton, bool]]] = None,
+        **kwargs
+    ):
         super().__init__(x, y, text, attributes=dict(
             checked=[True, False], **attributes), **kwargs)
+        self.ontoggle = ontoggle
 
     def _generate_image(self, text: str, *, focused: bool, checked: bool) -> pygame.Surface:
-        base = Assets.image.checked_button if checked else Assets.image.button
         image = self._build_image(
-            base, text, scale_factor=1.5 if focused else 0.0)
+            text, checked=checked,
+            scale_factor=(self.scale_factor + 1) if focused else None
+        )
 
         if not focused:
             self.width, self.height = image.get_size()
@@ -107,33 +110,45 @@ class CheckButton(Button):
         return image
 
     def click(self):
-        super().click()
         self.checked = not self.checked
+        if self.ontoggle is not None:
+            self.ontoggle(self, self.checked)
+        super().click()
 
 
 class ListButton(ButtonBase):
+    scale_factor = +0.25
     options: List[Any]
     index: int = 0
+    onchange: Optional[Callable[[ListButton, Any]]] = None
 
-    def __init__(self, x: int, y: int, options: Dict[str, Any], *, attributes: Dict[str, List[Any]] = {}, **kwargs):
+    def __init__(
+        self, x: int, y: int,
+        options: Dict[str, Any], *,
+        attributes: Dict[str, List[Any]] = {},
+        onchange: Optional[Callable[[ListButton, Any]]] = None,
+        **kwargs
+    ):
         super().__init__(x, y, gen_args=[list(options.keys())], attributes=dict(
             index=range(len(options)), **attributes), **kwargs)
         self.options = list(options.values())
+        self.onchange = onchange
 
     def _generate_image(self, options: List[str], *, index: int, focused: bool) -> pygame.Surface:
         image = self._build_image(
-            options[index], scale_factor=1.5 if focused else 0.0, width=186)
+            options[index], scale_factor=(self.scale_factor + 1) if focused else None, width=186)
 
         if not focused:
             self.width, self.height = image.get_size()
 
         return image
 
-    def _build_image(self, text: str, *, scale_factor: float = 0.0, **kwargs) -> pygame.Surface:
+    @staticmethod
+    def _build_image(text: str, *, scale_factor: Optional[float] = None, **kwargs) -> pygame.Surface:
         image = Box._generate_image(text, **kwargs)
         img_rect = image.get_rect()
 
-        if scale_factor:
+        if scale_factor is not None:
             image = pygame.transform.smoothscale(
                 image, (int(img_rect.width*scale_factor), int(img_rect.height*scale_factor)))
 
@@ -143,48 +158,71 @@ class ListButton(ButtonBase):
     def value(self):
         return self.options[self.index]
 
+    def click(self):
+        super().click()
+        self.next()
+
     def previous(self):
         self.index = (self.index - 1) % len(self.options)
+        if self.onchange is not None:
+            self.onchange(self, self.value)
 
     def set(self, index: int):
         self.index = index % len(self.options)
+        if self.onchange is not None:
+            self.onchange(self, self.value)
 
     def next(self):
         self.index = (self.index + 1) % len(self.options)
+        if self.onchange is not None:
+            self.onchange(self, self.value)
 
 
 class ControlButton(ButtonBase):
     checked: bool = False
+    onchange: Optional[Callable[[ControlButton, int]]] = None
 
     def __init__(
             self, x: int, y: int,
             image: pygame.Surface, *,
             gen_args: List[Any] = [],
             attributes: Dict[str, List[Any]] = {},
+            onchange: Optional[Callable[[ControlButton, int]]] = None,
             offsetx: int = 0,
             **kwargs):
         super().__init__(x, y, gen_args=gen_args + [image, offsetx], attributes=dict(
             checked=[True, False], **attributes), **kwargs)
+        self.onchange = onchange
 
     def _generate_image(self, image: pygame.Surface, offsetx: int, *, focused: bool, checked: bool) -> pygame.Surface:
         image = self._build_image(
-            image, scale_factor=1.5 if focused else 0.0, offsetx=offsetx, width=90, enabled=checked)
+            image, scale_factor=(self.scale_factor + 1) if focused else None, offsetx=offsetx, width=90, enabled=checked)
 
         if not focused:
             self.width, self.height = image.get_size()
 
         return image
 
-    def _build_image(self, image: pygame.Surface, *, scale_factor: float = 0.0, offsetx: int = 0, **kwargs) -> pygame.Surface:
+    @staticmethod
+    def _build_image(image: pygame.Surface, *, scale_factor: Optional[float] = None, offsetx: int = 0, **kwargs) -> pygame.Surface:
         image = Box._generate_image(image, offsetx=offsetx, **kwargs)
         img_rect = image.get_rect()
 
-        if scale_factor:
+        if scale_factor is not None:
             image = pygame.transform.smoothscale(
                 image, (int(img_rect.width*scale_factor), int(img_rect.height*scale_factor)))
 
         return image
 
     def click(self):
-        super().click()
         self.checked = not self.checked
+        super().click()
+
+    def event(self, event):
+        if self.checked and event.type == pygame.KEYDOWN:
+            if self.onchange is not None:
+                self.onchange(self, event.key)
+            self.checked = False
+            return False
+
+        return super().event(event)

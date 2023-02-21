@@ -1,6 +1,6 @@
 import pygame
 
-from assets import Assets
+from assets import ASSETS
 
 
 class Keys(pygame.sprite.Sprite):
@@ -11,16 +11,16 @@ class Keys(pygame.sprite.Sprite):
         self.game = game
         self.j = j
         if self.n == 1:
-            self.image = Assets.image.q2
+            self.image = ASSETS.image.q2
             self.k = "q"
         if self.n == 2:
-            self.image = Assets.image.z2
+            self.image = ASSETS.image.z2
             self.k = "z"
         if self.n == 3:
-            self.image = Assets.image.s2
+            self.image = ASSETS.image.s2
             self.k = "s"
         if self.n == 4:
-            self.image = Assets.image.d2
+            self.image = ASSETS.image.d2
             self.k = "d"
         self.image = pygame.transform.scale(self.image, (48, 48))
         self.rect = self.image.get_rect()

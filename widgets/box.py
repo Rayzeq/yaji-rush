@@ -1,9 +1,16 @@
+from enum import Enum
 from typing import Union, Optional, Dict, Any
 
 import pygame
 
-from assets import Assets
+from assets import ASSETS
 from . import Widget
+
+
+class Side(Enum):
+    Left = 0
+    Center = 1
+    Right = 2
 
 
 class Box(Widget):
@@ -14,12 +21,14 @@ class Box(Widget):
         padding: int = 0,
         font_size: int = 25,
         font_color: pygame.Color = pygame.Color(255, 255, 255),
+        side: Side = Side.Center,
         **kwargs: Dict[str, Any]
     ):
         super().__init__(x, y)
         self.image = self._generate_image(
             content, base=base, padding=padding,
             font_size=font_size, font_color=font_color,
+            side=side,
             **kwargs
         )
 
@@ -30,11 +39,12 @@ class Box(Widget):
         padding: int = 0,
         font_size: int = 25,
         font_color: pygame.Color = pygame.Color(255, 255, 255),
+        side: Side = Side.Center,
         offsetx: int = 0, offsety: int = 0,
         **kwargs: Dict[str, Any]
     ):
         if isinstance(content, str):
-            content = Assets.font.PrimaSansBold[font_size].render(
+            content = ASSETS.font.PrimaSansBold[font_size].render(
                 content, True, font_color)
             offsety -= 3
         elif isinstance(content, pygame.Surface):
@@ -45,11 +55,16 @@ class Box(Widget):
         content_bbox = content.get_rect()
 
         if base is None:
-            base = Assets.image.template(
+            if side == Side.Center:
+                width = content_bbox.width + 50 * 2 + padding * 2
+            else:
+                width = content_bbox.width + 50 + padding
+            base = ASSETS.image.template(
                 "box",
                 **{
-                    "width": content_bbox.width + 50 * 2 + padding * 2,
+                    "width": width,
                     "enabled": False,
+                    "side": side.value,
                     **kwargs
                 }
             )
@@ -57,7 +72,12 @@ class Box(Widget):
         base = base.copy()
         base_bbox = base.get_rect()
 
-        content_bbox.centerx = base_bbox.centerx + offsetx
+        if side == Side.Left:
+            content_bbox.right = base_bbox.right - 50 - padding + offsetx
+        elif side == Side.Center:
+            content_bbox.centerx = base_bbox.centerx + offsetx
+        else:
+            content_bbox.left = base_bbox.left + 50 + padding + offsetx
         content_bbox.centery = base_bbox.centery + offsety
 
         base.blit(content, content_bbox)

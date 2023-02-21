@@ -131,4 +131,4 @@ class Font(Asset, type="font", prefix="fonts"):
         return self._cache[size]
 
 
-Assets = AssetManager(Path(__file__).resolve().parent / "assets")
+ASSETS = AssetManager(Path(__file__).resolve().parent / "assets")

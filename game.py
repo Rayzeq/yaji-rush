@@ -4,7 +4,9 @@ from arrow import Arrow
 from keys import Keys
 from os import path
 
-from assets import Assets
+from saves import SAVES
+from assets import ASSETS
+from settings import SETTINGS
 
 
 def get_file(name):
@@ -18,7 +20,7 @@ class Game():
         self.screen = screen
         self.font = pygame.font.SysFont(None, 25)
         self.font2 = pygame.font.SysFont(None, 50)
-        self.img_flash = Assets.image.flash
+        self.img_flash = ASSETS.image.flash
         self.flashx = 0
         self.startimer_flash = 0
         self.mode = '1p'
@@ -34,11 +36,6 @@ class Game():
         self.high_score = 0
 
         self.arrows = pygame.sprite.Group()
-
-        self.ctrl_p1 = {'q': pygame.K_q, 'z': pygame.K_z,
-                        's': pygame.K_s, 'd': pygame.K_d}
-        self.ctrl_p2 = {'q': pygame.K_KP4, 'z': pygame.K_KP8,
-                        's': pygame.K_KP5, 'd': pygame.K_KP6}
 
         self.game1 = []
         self.game2 = []
@@ -150,19 +147,16 @@ class Game():
             arrow.remove()
 
         if self.mod1p != 'cstm':
-            with open(get_file('save/save_' + self.mod1p + '.txt'), 'r') as f:
-                self.high_score = int(f.read())
-
             if self.mod1p == 'scor':
+                SAVES.add({"time": "time", "life": "lives", "scor": "score"}[
+                          self.mod1p], self.final_time)
                 if self.final_time <= self.high_score:
                     self.high_score = self.final_time
-                    with open(get_file('save/save_' + self.mod1p + '.txt'), 'w') as f:
-                        f.writelines(str(self.high_score))
             else:
+                SAVES.add({"time": "time", "life": "lives", "scor": "score"}[
+                          self.mod1p], self.score)
                 if self.score >= self.high_score:
                     self.high_score = self.score
-                    with open(get_file('save/save_' + self.mod1p + '.txt'), 'w') as f:
-                        f.writelines(str(self.high_score))
         else:
             self.high_score = 'not aviable'
 
@@ -218,37 +212,37 @@ class Game():
         for key in self.game2:
             self.screen.blit(key.image, key.rect)
 
-        if self.presse.get(self.ctrl_p1['q']):
+        if self.presse.get(SETTINGS.p1_controls.left):
             self.q.pressed()
         else:
             self.q.unpressed()
-        if self.presse.get(self.ctrl_p1['z']):
+        if self.presse.get(SETTINGS.p1_controls.up):
             self.z.pressed()
         else:
             self.z.unpressed()
-        if self.presse.get(self.ctrl_p1['s']):
+        if self.presse.get(SETTINGS.p1_controls.down):
             self.s.pressed()
         else:
             self.s.unpressed()
-        if self.presse.get(self.ctrl_p1['d']):
+        if self.presse.get(SETTINGS.p1_controls.right):
             self.d.pressed()
         else:
             self.d.unpressed()
 
         if self.mode == '2p':
-            if self.presse.get(self.ctrl_p2['q']):
+            if self.presse.get(SETTINGS.p2_controls.left):
                 self.q2.pressed()
             else:
                 self.q2.unpressed()
-            if self.presse.get(self.ctrl_p2['z']):
+            if self.presse.get(SETTINGS.p2_controls.up):
                 self.z2.pressed()
             else:
                 self.z2.unpressed()
-            if self.presse.get(self.ctrl_p2['s']):
+            if self.presse.get(SETTINGS.p2_controls.down):
                 self.s2.pressed()
             else:
                 self.s2.unpressed()
-            if self.presse.get(self.ctrl_p2['d']):
+            if self.presse.get(SETTINGS.p2_controls.right):
                 self.d2.pressed()
             else:
                 self.d2.unpressed()

@@ -1,8 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${{width} * (100 / 46)} 100" width="${{width}}" height="46">
   <rect
-    x="4"
+    x="${[-45,4,4][{side}]}"
     y="4"
-    width="${{width} * (100 / 46) - 8}"
+    width="${{width} * (100 / 46) - 8 + [45,0,45][{side}]}"
     height="92"
     rx="45"
     ry="50"
@@ -12,10 +12,10 @@
     stroke="#131313"
     stroke-width="8"
   />
-  <circle r="43" cx="50" cy="50" fill="#131313"></circle>
-  <circle r="39" cx="50" cy="50" fill="#a3a3a3"></circle>
-  <circle r="34" cx="50" cy="50" fill="${'#891a1a' if {enabled} else '#717171'}"></circle>
-  <circle r="43" cx="${{width} * (100 / 46) - 50}" cy="50" fill="#131313"></circle>
-  <circle r="39" cx="${{width} * (100 / 46) - 50}" cy="50" fill="#a3a3a3"></circle>
-  <circle r="34" cx="${{width} * (100 / 46) - 50}" cy="50" fill="${'#891a1a' if {enabled} else '#717171'}"></circle>
+  <circle r="43" cx="${[-50,50,50][{side}]}" cy="50" fill="#131313"></circle>
+  <circle r="39" cx="${[-50,50,50][{side}]}" cy="50" fill="#a3a3a3"></circle>
+  <circle r="34" cx="${[-50,50,50][{side}]}" cy="50" fill="${'#891a1a' if {enabled} else '#717171'}"></circle>
+  <circle r="43" cx="${{width} * (100 / 46) - 50 + [0,0,100][{side}]}" cy="50" fill="#131313"></circle>
+  <circle r="39" cx="${{width} * (100 / 46) - 50 + [0,0,100][{side}]}" cy="50" fill="#a3a3a3"></circle>
+  <circle r="34" cx="${{width} * (100 / 46) - 50 + [0,0,100][{side}]}" cy="50" fill="${'#891a1a' if {enabled} else '#717171'}"></circle>
 </svg>
