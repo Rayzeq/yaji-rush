@@ -91,12 +91,12 @@ class Game1p(Scene):
             self.gameover()
 
     def gameover(self):
+        score = self.player.score
+        if self.mode == Mode.Score:
+            score = (pygame.time.get_ticks() -
+                     self.start_time) // 1000
+
         if self.mode != Mode.Custom:
-            if self.mode == Mode.Score:
-                score = (pygame.time.get_ticks() -
-                         self.start_time) // 1000
-            else:
-                score = self.player.score
             SAVES.add(self.mode, score)
         self.manager.goto(GameOver1p(self.mode, score))
 
