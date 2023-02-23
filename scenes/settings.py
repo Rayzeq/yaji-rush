@@ -1,6 +1,7 @@
 import pygame
 
 from assets import ASSETS
+from settings import SETTINGS
 from widgets.cog import Cog
 from widgets.menu import Menu
 from widgets.box import Title
@@ -9,26 +10,22 @@ from . import Scene
 
 
 class Settings(Scene):
-    def __init__(self, f1, f2, f3, f4, f5, f6, f7, f8):
-        self.background = ASSETS.image.background
+    def __init__(self):
+        super().__init__(ASSETS.image.background)
 
         self.left_menu = Menu(-100, 200) \
             .add_check("Time", ontoggle=self.toggle_time) \
             .add_check("Score", ontoggle=self.toggle_score) \
             .add_check("Lives", ontoggle=self.toggle_lives) \
-            .add("Controls", onclick=f4) \
+            .add("Controls", onclick=lambda _: self.manager.goto("controls")) \
             .add("Back", onclick=self.back)
 
         self.right_menu = Menu(288, 200) \
-            .add_list({"10s": 10000, "30s": 30000, "60s": 60000}, onchange=f6, hidden=True) \
-            .add_list({"500": 500, "1000": 1000, "2000": 2000}, onchange=f7, hidden=True) \
-            .add_list({"3": 3, "5": 5, "10": 10}, onchange=f8, hidden=True)
+            .add_list({"10s": 10, "30s": 30, "60s": 60}, onchange=self.change_time, hidden=True) \
+            .add_list({"500": 500, "1000": 1000, "2000": 2000}, onchange=self.change_score, hidden=True) \
+            .add_list({"3": 3, "5": 5, "10": 10}, onchange=self.change_lives, hidden=True)
         self.right_menu.unfocus()
 
-        self.f1 = f1
-        self.f2 = f2
-        self.f3 = f3
-        self.f5 = f5
         self.title = Title(0, 50, "Settings")
         self.title.x = (576 / 2) - (self.title.image.get_rect().width / 2)
         self.cogs = [
@@ -38,15 +35,24 @@ class Settings(Scene):
 
     def toggle_time(self, _, value: bool):
         self.right_menu.hidden[0] = not value
-        self.f1(value)
+        SETTINGS.time = self.right_menu.widgets[0].value if value else None
 
     def toggle_score(self, _, value: bool):
         self.right_menu.hidden[1] = not value
-        self.f2(value)
+        SETTINGS.score = self.right_menu.widgets[1].value if value else None
 
     def toggle_lives(self, _, value: bool):
         self.right_menu.hidden[2] = not value
-        self.f3(value)
+        SETTINGS.lives = self.right_menu.widgets[2].value if value else None
+
+    def change_time(self, _, value: int):
+        SETTINGS.time = value
+
+    def change_score(self, _, value: int):
+        SETTINGS.score = value
+
+    def change_lives(self, _, value: int):
+        SETTINGS.lives = value
 
     def tick(self, elapsed):
         for cog in self.cogs:
@@ -61,10 +67,10 @@ class Settings(Scene):
         self.right_menu.draw(surface)
 
     def back(self, button=None):
+        super().back()
         if button is not None:
             self.left_menu.selected = 0
             self.left_menu.focus()
-        self.f5()
 
     def event(self, event):
         if self.left_menu.focused:

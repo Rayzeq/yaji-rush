@@ -1,6 +1,6 @@
 from typing import Dict, Any, List, Callable, TypeVar, Tuple, Set
-import functools
-import inspect
+# import functools
+# import inspect
 
 Property = TypeVar("Property")
 
@@ -42,17 +42,17 @@ class PropertyMatrix:
         return self.variations[frozenset(attributes.items())]
 
 
-def override_kwargs(func):
-    signature = inspect.signature(func)
-    default_kwargs = {
-        k: v.default
-        for k, v in signature.parameters.items()
-        if v.default is not inspect.Parameter.empty
-    }
+# def override_kwargs(func):
+#     signature = inspect.signature(func)
+#     default_kwargs = {
+#         k: v.default
+#         for k, v in signature.parameters.items()
+#         if v.default is not inspect.Parameter.empty
+#     }
 
-    @functools.wraps(func)
-    def wrapper(*args, **kwargs):
-        kwargs = {**default_kwargs, **kwargs}
-        return func(**args, **kwargs)
+#     @functools.wraps(func)
+#     def wrapper(*args, **kwargs):
+#         kwargs = {**default_kwargs, **kwargs}
+#         return func(**args, **kwargs)
 
-    return wrapper
+#     return wrapper

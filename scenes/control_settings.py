@@ -13,7 +13,7 @@ from . import Scene
 
 class ControlSettings(Scene):
 
-    def __init__(self, f1):
+    def __init__(self):
         self.background = ASSETS.image.background
 
         self.top_menu = Menu(27, 200, spacing=144, direction=Direction.Horizontal) \
@@ -59,7 +59,6 @@ class ControlSettings(Scene):
 
         self.button_back = Button(-50, 500, "Back", onclick=self.back)
 
-        self.f1 = f1
         self.font = ASSETS.font.PrimaSansBold[25]
         self._cache = {
             "p1": {
@@ -157,10 +156,10 @@ class ControlSettings(Scene):
         surface.blit(img, rect)
 
     def back(self, button=None):
+        super().back()
         if button is not None:
             self.top_menu.focus()
             self.button_back.unfocus()
-        self.f1()
 
     def event(self, event):
         if self.top_menu.focused:

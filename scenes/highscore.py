@@ -10,12 +10,9 @@ from . import Scene
 
 
 class Highscore(Scene):
-    def __init__(self, f1):
-        self.background = ASSETS.image.background
-        self.cog = Cog(0, 0)
-        self.f1 = f1
+    def __init__(self):
+        super().__init__(ASSETS.image.background)
 
-    def refresh(self):
         self.foreground = pygame.Surface((576, 576), pygame.SRCALPHA)
         title = Title(0, 73, "High Scores")
         title.x = (576 / 2) - (title.image.get_rect().width / 2)
@@ -38,6 +35,8 @@ class Highscore(Scene):
         quit_box.x = (576 / 2) - (quit_box.image.get_rect().width / 2)
         quit_box.draw(self.foreground)
 
+        self.cog = Cog(0, 0)
+
     def tick(self, elapsed):
         self.cog.tick(elapsed)
 
@@ -45,6 +44,3 @@ class Highscore(Scene):
         super().draw(surface)
         self.cog.draw(surface)
         surface.blit(self.foreground, (0, 0))
-
-    def back(self):
-        self.f1()
