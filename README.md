@@ -1,6 +1,6 @@
 # Yaji-Rush
 
-Version: 1.0.0
+Version: 1.0.2-HD
 Authors:
 - Mylo#2896 <joachim.fevre@gmail.com>
 - Rayzeq#7750
