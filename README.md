@@ -8,7 +8,7 @@ Authors:
 ## Installation
 ### Windows
 - Install python [here](https://www.python.org/downloads/)
-- Install pygame (in cmd: `pip install pygame`)
+- Install pygame (in cmd: `pip install -U pygame numpy`)
 - Run `main.py` (in cmd: `python main.py`)
 
 ### Linux
