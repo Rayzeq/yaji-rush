@@ -28,6 +28,7 @@ class Game():
 		self.mod1p = 'time'
 		self.final_time = 0
 		self.high_score = 0
+		self.hs_guy = ''
 
 		self.arrows = pygame.sprite.Group()
 
@@ -142,23 +143,63 @@ class Game():
 			arrow.remove()
 
 		if self.mod1p != 'cstm':
-			with open(get_file('save\\save_' + self.mod1p + '.txt'), 'r') as f:
-				self.high_score = int(f.read())
-
-			if self.mod1p == 'scor':
-				if self.final_time <= self.high_score:
+			if self.save_vierge(self.mod1p):
+				if self.mod1p == 'scor':
 					self.high_score = self.final_time
-					with open(get_file('save\\save_' + self.mod1p + '.txt'), 'w') as f:
-						f.writelines(str(self.high_score))
-			else:
-				if self.score >= self.high_score:
+				else:
 					self.high_score = self.score
-					with open(get_file('save\\save_' + self.mod1p + '.txt'), 'w') as f:
-						f.writelines(str(self.high_score))
-		else:
-			self.high_score = 'not aviable'
+				self.phase = 'nhs'
+			else:
+				self.high_score = self.get_hs(self.mod1p)
 
-		self.phase = 'gameover1p'
+				if self.mod1p == 'scor':
+					if self.final_time <= self.high_score:
+						self.high_score = self.final_time
+						self.phase = 'nhs'
+					else:
+						self.phase = 'gameover1p'
+						
+				else:
+					if self.score >= self.high_score:
+						self.high_score = self.score
+						self.phase = 'nhs'
+					else:
+						self.phase = 'gameover1p'
+		else:
+			self.phase = 'gameover1p'
+
+	def save(self):
+		with open(get_file('save\\save_' + self.mod1p + '.txt'), 'w') as f:
+			f.writelines(self.hs_guy + '.' + str(self.high_score))
+
+	def save_vierge(self, mod):
+		with open(get_file('save\\save_' + mod + '.txt'), 'r') as f:
+				n = f.read()
+		return n==''
+
+	def get_hs(self, mod):
+		if self.save_vierge(mod):
+			return 'no high_score'
+		with open(get_file('save\\save_' + mod + '.txt'), 'r') as f:
+				n = f.read()
+		i=0
+		while n[i]!='.':
+			i+=1
+		s=''
+		for j in range(i+1, len(n)):
+			s+=n[j]
+		return int(s)
+
+	def get_hs_guy(self, mod):
+		with open(get_file('save\\save_' + mod + '.txt'), 'r') as f:
+				n = f.read()
+		i=0
+		s=''
+		while n[i]!='.':
+			s+=n[i]
+			i+=1
+		return s
+
 
 	def update(self):
 

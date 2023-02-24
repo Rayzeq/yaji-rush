@@ -13,7 +13,6 @@ def get_file(name):
 pygame.display.set_caption('Yaji-Rush')
 screen = pygame.display.set_mode((576,576))
 
-
 font = pygame.font.SysFont(None, 25)
 font_won = pygame.font.SysFont(None, 50)
 
@@ -26,6 +25,7 @@ bg_go_2p = pygame.image.load(get_file('assets\\bg_go_2p.png'))
 
 bgSet = pygame.image.load(get_file('assets\\bg_test.png'))
 bg_hs = pygame.image.load(get_file('assets\\bg_hs.png'))
+bg_nhs = pygame.image.load(get_file('assets\\bg_nhs.png'))
 
 title = Title(screen)
 title_animation = 0
@@ -74,11 +74,13 @@ buttons_key2.add('assets\\btn_k_d.png')
 btn_back_ctrl = Button('assets\\btn_back.png', -50, 500)
 
 cursor = 0
-cur1p = -1
-curset = [-1,0]
-curctrl = [-1,0]
+cur1p = 0
+curset = [0,0]
+curctrl = [0,0]
 
 key_selected = False
+
+key_not_alpha = [pygame.K_UP, pygame.K_DOWN, pygame.K_LEFT, pygame.K_RIGHT, pygame.K_ESCAPE, pygame.K_SPACE, pygame.K_RETURN, pygame.K_BACKSPACE, pygame.K_LSHIFT, pygame.K_RSHIFT, pygame.K_LCTRL, pygame.K_RCTRL, pygame.K_RALT, pygame.K_LALT, pygame.K_LMETA, pygame.K_CAPSLOCK, pygame.K_TAB, pygame.K_KP0, pygame.K_KP1, pygame.K_KP2, pygame.K_KP3, pygame.K_KP4, pygame.K_KP5, pygame.K_KP6, pygame.K_KP7, pygame.K_KP8, pygame.K_KP9, pygame.K_KP_ENTER, pygame.K_KP_PERIOD, pygame.K_NUMLOCK, pygame.K_KP_PLUS, pygame.K_KP_MINUS, pygame.K_KP_DIVIDE, pygame.K_KP_MULTIPLY]
 
 game = Game(screen, {0 : buttons_set.buttons[0].is_int, 1 : buttons_set.buttons[1].is_int, 2 : buttons_set.buttons[2].is_int})
 
@@ -137,18 +139,24 @@ while running:
             buttons_1p.unselect()
 
     elif game.phase == 'hs':
-        with open(get_file('save\\save_time.txt'), 'r') as f:
-                high_score_time = f.read()
-        with open(get_file('save\\save_scor.txt'), 'r') as f:
-                high_score_scor = f.read()
-        with open(get_file('save\\save_life.txt'), 'r') as f:
-                high_score_life = f.read()
+        if game.save_vierge('time'):
+            hs_time = 'no high-score'
+        else:
+            hs_time = f'{game.get_hs("time")} by {game.get_hs_guy("time")}'
+        if game.save_vierge('scor'):
+            hs_scor = 'no high-score'
+        else:
+            hs_scor = f'{game.get_hs("scor")}s by {game.get_hs_guy("scor")}'
+        if game.save_vierge('life'):
+            hs_life = 'no high-score'
+        else:
+            hs_life = f'{game.get_hs("life")} by {game.get_hs_guy("life")}'
         screen.blit(bgSet, (0,0))
         cog7.animate()
         screen.blit(bg_hs, (0,0))
-        screen.blit(font_won.render(high_score_time, True, (255,255,255)), (200,198))
-        screen.blit(font_won.render(high_score_scor+'s', True, (255,255,255)), (210,294))
-        screen.blit(font_won.render(high_score_life, True, (255,255,255)), (200,390))
+        screen.blit(font_won.render(hs_time, True, (255,255,255)), (200,198))
+        screen.blit(font_won.render(hs_scor, True, (255,255,255)), (210,294))
+        screen.blit(font_won.render(hs_life, True, (255,255,255)), (200,390))
 
     elif game.phase == 'settings':
         screen.blit(bgSet, (0,0))
@@ -223,10 +231,19 @@ while running:
         screen.blit(bg_go_1p, (0,0))
         if game.mod1p == 'scor':
             screen.blit(font_won.render(str(game.final_time) + 's', True, (255,255,255)), (250,222))
-            screen.blit(font_won.render(str(game.high_score) + 's', True, (255,255,255)), (324,342))
+            screen.blit(font_won.render(f'{game.get_hs("scor")}s', True, (255,255,255)), (324,342))
+        elif game.mod1p == 'cstm':
+            screen.blit(font_won.render(str(game.score), True, (255,255,255)), (250,222))
+            screen.blit(font_won.render('Not aviable', True, (255,255,255)), (324,342))
         else:
             screen.blit(font_won.render(str(game.score), True, (255,255,255)), (250,222))
-            screen.blit(font_won.render(str(game.high_score), True, (255,255,255)), (324,342))
+            screen.blit(font_won.render(f'{game.get_hs(game.mod1p)}', True, (255,255,255)), (324,342))
+        if not game.save_vierge(game.mod1p):
+            screen.blit(font_won.render(f'high-score by {game.get_hs_guy(game.mod1p)}', True, (255,255,255)), (100,390))
+
+    elif game.phase == 'nhs':
+        screen.blit(bg_nhs, (0,0))
+        screen.blit(font_won.render(game.hs_guy, True, (255,255,255)), (145,300))
 
     pygame.display.flip()
 
@@ -256,7 +273,7 @@ while running:
                 if event.key == pygame.K_ESCAPE:
                     pygame.quit()
 
-            if game.phase == '1p': 
+            elif game.phase == '1p': 
                 if event.key == pygame.K_RETURN:
                     if cur1p != -1:
                         if cur1p == 4:
@@ -279,18 +296,18 @@ while running:
                                 game.gameset2 = game.gameset.copy()
                                 game.mod1p = 'cstm'
                             game.start()  
-                    cur1p = -1 
+                    cur1p = 0
                 if event.key == pygame.K_UP and cur1p > 0:
                     cur1p -= 1
                 if event.key == pygame.K_DOWN and cur1p < 5:
                     cur1p +=1
                 if event.key == pygame.K_ESCAPE:
-                    cur1p = -1
+                    cur1p = 0
                     game.phase = 'title'
 
-            if game.phase == 'settings':
+            elif game.phase == 'settings':
                 if event.key == pygame.K_ESCAPE:
-                    curset = [-1,0]
+                    curset = [0,0]
                     game.phase = 'title'
 
                 elif event.key == pygame.K_UP and curset[0] > 0:
@@ -307,12 +324,12 @@ while running:
                         if curset[0] > 2:
                             if curset[0] == 3:
                                 game.phase = 'key_set'
-                                curset = [-1,0]
-                                curctrl = [-1,0]
+                                curset = [0,0]
+                                curctrl = [0,0]
                                 key_selected = False
                             else:
                                 game.phase = 'title'
-                                curset = [-1,0]
+                                curset = [0,0]
                         elif curset[1]==0:
                             if buttons_set.buttons[curset[0]].is_int:
                                 buttons_set.buttons[curset[0]].deint()
@@ -325,7 +342,7 @@ while running:
                             game.gameset[curset[0]] = buttons_set2.buttons[curset[0]].gameset[curset[0]][buttons_set2.buttons[curset[0]].n-1]
 
             
-            if game.phase == 'key_set':
+            elif game.phase == 'key_set':
                 if event.key == pygame.K_ESCAPE:
                     game.phase = 'settings'
                 elif event.key == pygame.K_UP and curctrl[0] > 0 and key_selected == False:
@@ -346,7 +363,47 @@ while running:
                         elif curctrl[0] == 1:
                             buttons_key2.buttons[curctrl[1]].int()
                         key_selected = True
-                        
+
+            elif game.phase == 'game':
+                if game.mode == '1p' and event.key == pygame.K_ESCAPE:
+                    game.gameover1p()
+                if game.mode == '2p' and event.key == pygame.K_ESCAPE:
+                    game.gameover('tied')
+                if event.key == game.ctrl_p1['z']:
+                    game.verif_p1('z')
+                if event.key == game.ctrl_p1['q']:
+                    game.verif_p1('q')
+                if event.key == game.ctrl_p1['s']:
+                    game.verif_p1('s')
+                if event.key == game.ctrl_p1['d']:
+                    game.verif_p1('d')
+
+                if game.mode == '2p':
+                    if event.key == game.ctrl_p2['z']:
+                        game.verif_p2('z')
+                    if event.key == game.ctrl_p2['q']:
+                        game.verif_p2('q')
+                    if event.key == game.ctrl_p2['s']:
+                        game.verif_p2('s')
+                    if event.key == game.ctrl_p2['d']:
+                        game.verif_p2('d')    
+
+            elif game.phase == 'nhs':
+                if event.key not in key_not_alpha and len(game.hs_guy) < 9:
+                    game.hs_guy += pygame.key.name(event.key)
+
+                elif event.key == pygame.K_SPACE and len(game.hs_guy)<9:
+                    game.hs_guy += " "
+
+                elif event.key == pygame.K_BACKSPACE:
+                    game.hs_guy = game.hs_guy[:-1]
+
+                elif event.key == pygame.K_RETURN:
+                    game.save()
+                    game.phase = 'gameover1p'
+
+            elif event.key == pygame.K_RETURN and (game.phase == 'gameover' or game.phase == 'gameover1p'):
+                game.phase = 'title'
 
             if key_selected and game.phase == 'key_set' and event.key != pygame.K_RETURN:
                 if curctrl == [0,0]:
@@ -371,33 +428,6 @@ while running:
                 else:
                     buttons_key2.buttons[curctrl[1]].deint()
                 key_selected = False
-
-            if game.phase == 'game':
-                if game.mode == '1p' and event.key == pygame.K_ESCAPE:
-                    game.gameover1p()
-                if game.mode == '2p' and event.key == pygame.K_ESCAPE:
-                    game.gameover('tied')
-                if event.key == game.ctrl_p1['z']:
-                    game.verif_p1('z')
-                if event.key == game.ctrl_p1['q']:
-                    game.verif_p1('q')
-                if event.key == game.ctrl_p1['s']:
-                    game.verif_p1('s')
-                if event.key == game.ctrl_p1['d']:
-                    game.verif_p1('d')
-
-                if game.mode == '2p':
-                    if event.key == game.ctrl_p2['z']:
-                        game.verif_p2('z')
-                    if event.key == game.ctrl_p2['q']:
-                        game.verif_p2('q')
-                    if event.key == game.ctrl_p2['s']:
-                        game.verif_p2('s')
-                    if event.key == game.ctrl_p2['d']:
-                        game.verif_p2('d')
-
-            if event.key == pygame.K_RETURN and (game.phase == 'gameover' or game.phase == 'gameover1p'):
-                game.phase = 'title'
 
             if event.key == pygame.K_ESCAPE and game.phase == 'hs':
                 game.phase = '1p'
