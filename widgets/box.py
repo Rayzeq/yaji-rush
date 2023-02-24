@@ -93,4 +93,4 @@ class Title(Box):
         self, x: int, y: int, text: str, *,
         color: pygame.Color = pygame.Color(255, 255, 255), padding: int = 10,
     ):
-        super().__init__(x, y, text, font_color=color, padding=padding)
+        super().__init__(x, y, text, font_color=color, padding=padding, width=289)
