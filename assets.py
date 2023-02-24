@@ -46,6 +46,13 @@ class AssetTypeProxy:
                 return file
         raise ValueError(f"No asset named `{name}`")
 
+    def _get_template_name(self, name: str, **kwargs):
+        kwargs = sorted(list(kwargs.items()), key=lambda x: x[0])
+        return name + '-' + '-'.join(str(x[1]) for x in kwargs)
+
+    def _get_png_path(self, name: str, **kwargs) -> Path:
+        return self._get_asset_path(self._get_template_name(name, **kwargs))
+
     def __getattr__(self, name: str) -> Asset:
         if name in self._cache:
             return self._cache[name]
@@ -59,21 +66,30 @@ class AssetTypeProxy:
         return self.__getattr__(name)
 
     def template(self, name: str, **kwargs):
-        path = self._get_asset_path(name)
         cache_key = (name, *kwargs.values())
 
         if cache_key not in self._cache:
-            with open(path, "r") as f:
-                result: str = f.read()
+            try:
+                path = self._get_asset_path(name)
+            except ValueError:
+                path = self._get_png_path(name, **kwargs)
+                self._cache[cache_key] = self.AssetType(name, path)
+            else:
+                with open(path, "r") as f:
+                    result: str = f.read()
 
-            while (pos := result.find("${")) != -1:
-                end_pos = self._find_end_pos(result, pos + 2)
-                expr = result[pos+2:end_pos-1].format(**kwargs)
-                expr = eval(expr)
-                result = result[:pos] + str(expr) + result[end_pos:]
+                while (pos := result.find("${")) != -1:
+                    end_pos = self._find_end_pos(result, pos + 2)
+                    expr = result[pos+2:end_pos-1].format(**kwargs)
+                    expr = eval(expr)
+                    result = result[:pos] + str(expr) + result[end_pos:]
 
-            self._cache[cache_key] = self.AssetType(
-                name, io.BytesIO(result.encode()))
+                self._cache[cache_key] = self.AssetType(
+                    name, io.BytesIO(result.encode()))
+                if self.AssetType is Image:
+                    name = self._get_template_name(name, **kwargs)
+                    pygame.image.save(
+                        self._cache[cache_key], self.path / (name + '.png'))
 
         return self._cache[cache_key]
 
@@ -112,7 +128,10 @@ class Asset(ABC):
 
 class Image(Asset, type="image", prefix="images"):
     def __new__(cls, name: str, path: Path):
-        return pygame.image.load(path).convert_alpha()
+        img = pygame.image.load(path).convert_alpha()
+        if isinstance(path, Path) and path.suffix == ".svg":
+            pygame.image.save(img, path.parent / (path.stem + ".png"))
+        return img
 
 
 class Font(Asset, type="font", prefix="fonts"):

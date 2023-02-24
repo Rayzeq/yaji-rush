@@ -1,3 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" width="50" height="50">
-  <polygon points="1,33 59,33 59,1 127,64 59,127 59,97 1,97" fill="#222222" stroke="#4a4a4a" stroke-width="1" transform="rotate(${{angle}},64,64)" />
-</svg>
