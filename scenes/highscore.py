@@ -31,7 +31,7 @@ class Highscore(Scene):
             .add(Box(0, 0, f"Lives: {lives}", side=Side.Right, width=525))
         scores.draw(self.foreground)
 
-        quit_box = Box(0, 505, "Press Escape")
+        quit_box = Box(0, 505, "Press Escape", width=285)
         quit_box.x = (576 / 2) - (quit_box.image.get_rect().width / 2)
         quit_box.draw(self.foreground)
 
