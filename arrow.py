@@ -27,7 +27,7 @@ class Arrow(ABC):
         Type = random.choices(
             [Normal, PlusTwo, PlusThree, TimesTwo,
                 DirectionTrap, ColorTrap, ColumnTrap, DoomedBySatan, GiftedByGod],
-            weights=[75, 10, 3, 2, 4, 3, 1, 1, 1]  # en %
+            weights=[75, 10, 4, 2, 3, 3, 2, .5, .5]  # en %
         )[0]
         direction = random.choice(list(Direction))
         return Type(direction)

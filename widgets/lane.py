@@ -1,4 +1,5 @@
 import pygame
+import numpy as np
 
 import arrow
 from arrow import Arrow, Direction
@@ -37,9 +38,6 @@ class PlayerLane(Widget):
             self.display_lives = display_lives
 
         self.doomed_cache = (0, None)
-        self.gifted_overlay = pygame.Surface((202, 576))
-        self.gifted_overlay.fill((255, 255, 255))
-        self.gifted_overlay.set_alpha(20)
 
     def draw_background(self, surface, lives=None):
         surface.blit(ASSETS.image.player_lane, (self.x, 0))
@@ -97,15 +95,15 @@ class PlayerLane(Widget):
                 surface.blit(self.doomed_cache[1], (self.x + 18, 0))
             else:
                 s = surface.subsurface((self.x + 18, 0, 202, 576)).copy()
-                width, height = s.get_size()
-                for x in range(width):
-                    for y in range(height):
-                        red, green, blue, alpha = s.get_at((x, y))
-                        average = 0.3 * red + 0.59 * green + 0.11 * blue
-                        gs_color = (average, average, average, alpha)
-                        s.set_at((x, y), gs_color)
+                img = pygame.surfarray.pixels3d(s)
+                img[:] = np.stack(
+                    (np.dot(img, [0.2989, 0.5870, 0.1140]),)*3, axis=-1)
+                del img
                 self.doomed_cache = (self.player.doomed_by_satan, s)
         elif self.player.gifted_by_god > pygame.time.get_ticks():
-            surface.blit(self.gifted_overlay, (self.x + 18, 0))
+            img = pygame.surfarray.pixels3d(
+                surface.subsurface((self.x + 18, 0, 202, 576)))
+            img[:] = np.clip(img * 1.7, 0, 255).astype(np.uint8)
+            del img
         elif self.flash_time > pygame.time.get_ticks():
             surface.blit(ASSETS.image.flash, (self.x - 25, 0))

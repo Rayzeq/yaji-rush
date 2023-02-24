@@ -21,6 +21,9 @@ class Game1p(Scene):
         background.blit(ASSETS.image.game_base, (0, 0))
         self.lane.draw_background(background)
 
+        self._start_time = None
+        self.greyed_cache = None
+
         self.end_time = None
         if mode is Mode.Time \
            or mode is Mode.Score \
@@ -30,7 +33,6 @@ class Game1p(Scene):
             timer_rect.y = 397
             self.timer_rect = timer_rect
             background.blit(ASSETS.image.timer, timer_rect)
-            self.start_time = pygame.time.get_ticks()
 
         super().__init__(background)
         self.mode = mode
@@ -58,7 +60,17 @@ class Game1p(Scene):
             SETTINGS.p1_controls.right: Direction.Right,
         }
 
+        self.countdown = pygame.time.get_ticks() + 4000
+
+    @property
+    def start_time(self):
+        return self._start_time or pygame.time.get_ticks()
+
     def tick(self, _):
+        if self.countdown < pygame.time.get_ticks() and self._start_time is None:
+            self._start_time = pygame.time.get_ticks()
+            return
+
         if self.end_time is not None and pygame.time.get_ticks() - self.start_time > (self.end_time * 1000):
             self.gameover()
 
@@ -82,6 +94,24 @@ class Game1p(Scene):
 
         self.lane.draw(surface)
 
+        if self.greyed_cache is None:
+            self.greyed_cache = surface.copy()
+            img = pygame.surfarray.pixels3d(self.greyed_cache)
+            img[:] = img // 2
+            del img
+
+        if self.countdown > pygame.time.get_ticks():
+            surface.blit(self.greyed_cache, (0, 0))
+
+            countdown = (self.countdown - pygame.time.get_ticks()) // 1000
+            if countdown == 0:
+                countdown = "GO"
+            countdown = ASSETS.font.PrimaSansBold[50].render(
+                str(countdown), True, (255, 0, 0))
+            countdown_rect = countdown.get_rect()
+            countdown_rect.center = (576//2, 576//2)
+            surface.blit(countdown, countdown_rect)
+
     def key_pressed(self, direction):
         self.lane.key_pressed(direction)
 
@@ -101,13 +131,14 @@ class Game1p(Scene):
         self.manager.goto(GameOver1p(self.mode, score))
 
     def event(self, event):
-        if event.type == pygame.KEYDOWN and event.key in self.key_lookup:
-            direction = self.key_lookup[event.key]
-            self.lane.pressed[direction] = True
-            self.key_pressed(direction)
-            return False
-        elif event.type == pygame.KEYUP and event.key in self.key_lookup:
-            direction = self.key_lookup[event.key]
-            self.lane.pressed[direction] = False
+        if not self.countdown > pygame.time.get_ticks():
+            if event.type == pygame.KEYDOWN and event.key in self.key_lookup:
+                direction = self.key_lookup[event.key]
+                self.lane.pressed[direction] = True
+                self.key_pressed(direction)
+                return False
+            elif event.type == pygame.KEYUP and event.key in self.key_lookup:
+                direction = self.key_lookup[event.key]
+                self.lane.pressed[direction] = False
 
         return super().event(event)
