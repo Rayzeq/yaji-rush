@@ -238,8 +238,9 @@ while running:
         else:
             screen.blit(font_won.render(str(game.score), True, (255,255,255)), (250,222))
             screen.blit(font_won.render(f'{game.get_hs(game.mod1p)}', True, (255,255,255)), (324,342))
-        if not game.save_vierge(game.mod1p):
-            screen.blit(font_won.render(f'high-score by {game.get_hs_guy(game.mod1p)}', True, (255,255,255)), (100,390))
+        if game.mod1p != 'cstm':
+            if not game.save_vierge(game.mod1p):
+                screen.blit(font_won.render(f'high-score by {game.get_hs_guy(game.mod1p)}', True, (255,255,255)), (100,390))
 
     elif game.phase == 'nhs':
         screen.blit(bg_nhs, (0,0))
@@ -364,7 +365,7 @@ while running:
                             buttons_key2.buttons[curctrl[1]].int()
                         key_selected = True
 
-            elif game.phase == 'game':
+            elif game.phase == 'game' and game.can_play:
                 if game.mode == '1p' and event.key == pygame.K_ESCAPE:
                     game.gameover1p()
                 if game.mode == '2p' and event.key == pygame.K_ESCAPE:

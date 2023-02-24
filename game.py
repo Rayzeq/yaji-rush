@@ -29,6 +29,7 @@ class Game():
 		self.final_time = 0
 		self.high_score = 0
 		self.hs_guy = ''
+		self.can_play = False
 
 		self.arrows = pygame.sprite.Group()
 
@@ -119,6 +120,7 @@ class Game():
 				self.game2.append(self.create_key(288, i*48)[0])
 
 	def gameover(self, win):
+		self.can_play = False
 		self.game1.clear()
 		self.game2.clear()
 		
@@ -134,6 +136,7 @@ class Game():
 		self.win = win
 
 	def gameover1p(self):
+		self.can_play = False
 		self.vie1 = 5
 		self.game1.clear()
 		for key in self.all_keys1:
@@ -200,114 +203,123 @@ class Game():
 			i+=1
 		return s
 
+	def true_start(self):
+		self.start_time = pygame.time.get_ticks()
+		self.can_play = True
 
 	def update(self):
 
-		if self.mode == '2p' and self.gameplan[0]:
-			if (pygame.time.get_ticks()-self.start_time)//1000 < 10:
-				self.screen.blit(self.font2.render(str((pygame.time.get_ticks()-self.start_time)//1000), True, (0,0,0)), (278,270))
-			else:
-				self.screen.blit(self.font2.render(str((pygame.time.get_ticks()-self.start_time)//1000), True, (0,0,0)), (268,270))
-		if self.mode == '1p' and (self.gameplan2[0] or self.mod1p == 'scor'):
-			if (pygame.time.get_ticks()-self.start_time)//1000 < 10:
-				self.screen.blit(self.font2.render(str((pygame.time.get_ticks()-self.start_time)//1000), True, (0,0,0)), (135,465))
-			else:
-				self.screen.blit(self.font2.render(str((pygame.time.get_ticks()-self.start_time)//1000), True, (0,0,0)), (125,465))
-
-		if self.mode == '1p':
-			self.screen.blit(self.font.render(f'Score : {self.score}', True, (0,0,0)), (200,492))
-			self.screen.blit(self.font.render(f'Combo : {self.combo}', True, (0,0,0)), (200,516))
-			if self.gameplan2[2]:
-				self.screen.blit(self.font.render(f'Lives : {self.vie1}', True, (0,0,0)), (200,540))
+		if not self.can_play:
+			self.screen.blit(self.font2.render(str(3-((pygame.time.get_ticks()-self.start_time)//1000)), True, (255,255,255)), (278,270))
+			print((pygame.time.get_ticks()-self.start_time)//1000 >= 4)
+			if (pygame.time.get_ticks()-self.start_time)//1000 >= 4:
+				self.true_start()
 		else:
-			self.screen.blit(self.font.render(f'Score : {self.score}', True, (0,0,0)), (55,492))
-			self.screen.blit(self.font.render(f'Combo : {self.combo}', True, (0,0,0)), (55,516))
-			if self.gameplan[2]:
-				self.screen.blit(self.font.render(f'Lives : {self.vie1}', True, (0,0,0)), (55,540))
+			if self.mode == '2p' and self.gameplan[0]:
+				if (pygame.time.get_ticks()-self.start_time)//1000 < 10:
+					self.screen.blit(self.font2.render(str((pygame.time.get_ticks()-self.start_time)//1000), True, (0,0,0)), (278,270))
+				else:
+					self.screen.blit(self.font2.render(str((pygame.time.get_ticks()-self.start_time)//1000), True, (0,0,0)), (268,270))
+			if self.mode == '1p' and (self.gameplan2[0] or self.mod1p == 'scor'):
+				if (pygame.time.get_ticks()-self.start_time)//1000 < 10:
+					self.screen.blit(self.font2.render(str((pygame.time.get_ticks()-self.start_time)//1000), True, (0,0,0)), (135,465))
+				else:
+					self.screen.blit(self.font2.render(str((pygame.time.get_ticks()-self.start_time)//1000), True, (0,0,0)), (125,465))
 
-			self.screen.blit(self.font.render(f'Score : {self.score2}', True, (0,0,0)), (343,492))
-			self.screen.blit(self.font.render(f'Combo : {self.combo2}', True, (0,0,0)), (343,516))
-			if self.gameplan[2]:
-				self.screen.blit(self.font.render(f'Lives : {self.vie2}', True, (0,0,0)), (343,540))
-
-		for arrow in self.arrows:
-			self.screen.blit(arrow.image, arrow.rect)
-
-		for key in self.game1:
-			self.screen.blit(key.image, key.rect)
-		for key in self.game2:
-			self.screen.blit(key.image, key.rect)
-
-		if self.presse.get(self.ctrl_p1['q']):
-			self.q.pressed()
-		else:
-			self.q.unpressed()
-		if self.presse.get(self.ctrl_p1['z']):
-			self.z.pressed()
-		else:
-			self.z.unpressed()
-		if self.presse.get(self.ctrl_p1['s']):
-			self.s.pressed()
-		else:
-			self.s.unpressed()
-		if self.presse.get(self.ctrl_p1['d']):
-			self.d.pressed()
-		else:
-			self.d.unpressed()
-
-		if self.mode == '2p':
-			if self.presse.get(self.ctrl_p2['q']):
-				self.q2.pressed()
+			if self.mode == '1p':
+				self.screen.blit(self.font.render(f'Score : {self.score}', True, (0,0,0)), (200,492))
+				self.screen.blit(self.font.render(f'Combo : {self.combo}', True, (0,0,0)), (200,516))
+				if self.gameplan2[2]:
+					self.screen.blit(self.font.render(f'Lives : {self.vie1}', True, (0,0,0)), (200,540))
 			else:
-				self.q2.unpressed()
-			if self.presse.get(self.ctrl_p2['z']):
-				self.z2.pressed()
-			else:
-				self.z2.unpressed()
-			if self.presse.get(self.ctrl_p2['s']):
-				self.s2.pressed()
-			else:
-				self.s2.unpressed()
-			if self.presse.get(self.ctrl_p2['d']):
-				self.d2.pressed()
-			else:
-				self.d2.unpressed()
+				self.screen.blit(self.font.render(f'Score : {self.score}', True, (0,0,0)), (55,492))
+				self.screen.blit(self.font.render(f'Combo : {self.combo}', True, (0,0,0)), (55,516))
+				if self.gameplan[2]:
+					self.screen.blit(self.font.render(f'Lives : {self.vie1}', True, (0,0,0)), (55,540))
 
-		if self.mode == '2p':
-			if self.gameplan[0]:
-				if pygame.time.get_ticks()-self.start_time > self.gameset[0]:
-					if self.score > self.score2:
+				self.screen.blit(self.font.render(f'Score : {self.score2}', True, (0,0,0)), (343,492))
+				self.screen.blit(self.font.render(f'Combo : {self.combo2}', True, (0,0,0)), (343,516))
+				if self.gameplan[2]:
+					self.screen.blit(self.font.render(f'Lives : {self.vie2}', True, (0,0,0)), (343,540))
+
+			for arrow in self.arrows:
+				self.screen.blit(arrow.image, arrow.rect)
+
+			for key in self.game1:
+				self.screen.blit(key.image, key.rect)
+			for key in self.game2:
+				self.screen.blit(key.image, key.rect)
+
+			if self.presse.get(self.ctrl_p1['q']):
+				self.q.pressed()
+			else:
+				self.q.unpressed()
+			if self.presse.get(self.ctrl_p1['z']):
+				self.z.pressed()
+			else:
+				self.z.unpressed()
+			if self.presse.get(self.ctrl_p1['s']):
+				self.s.pressed()
+			else:
+				self.s.unpressed()
+			if self.presse.get(self.ctrl_p1['d']):
+				self.d.pressed()
+			else:
+				self.d.unpressed()
+
+			if self.mode == '2p':
+				if self.presse.get(self.ctrl_p2['q']):
+					self.q2.pressed()
+				else:
+					self.q2.unpressed()
+				if self.presse.get(self.ctrl_p2['z']):
+					self.z2.pressed()
+				else:
+					self.z2.unpressed()
+				if self.presse.get(self.ctrl_p2['s']):
+					self.s2.pressed()
+				else:
+					self.s2.unpressed()
+				if self.presse.get(self.ctrl_p2['d']):
+					self.d2.pressed()
+				else:
+					self.d2.unpressed()
+
+			if self.mode == '2p':
+				if self.gameplan[0]:
+					if pygame.time.get_ticks()-self.start_time > self.gameset[0]:
+						if self.score > self.score2:
+							self.gameover(1)
+						elif self.score < self.score2:
+							self.gameover(2)
+						else:
+							self.gameover('tied')
+				if self.gameplan[1]:
+					if self.score >= self.gameset[1]:
 						self.gameover(1)
-					elif self.score < self.score2:
+					if self.score2 >= self.gameset[1]:
 						self.gameover(2)
-					else:
-						self.gameover('tied')
-			if self.gameplan[1]:
-				if self.score >= self.gameset[1]:
-					self.gameover(1)
-				if self.score2 >= self.gameset[1]:
-					self.gameover(2)
-			if self.gameplan[2]:
-				if self.vie1 == 0:
-					self.gameover(2)
-				elif self.vie2 == 0:
-					self.gameover(1)
-		else:
-			if self.gameplan2[0]:
-				if pygame.time.get_ticks()-self.start_time > self.gameset2[0]:
-					self.gameover1p()
-			if self.gameplan2[1]:
-				if self.score >= self.gameset2[1]:
-					self.final_time = (pygame.time.get_ticks()-self.start_time)//1000
-					self.gameover1p()
-			if self.gameplan2[2]:
-				if self.vie1 == 0:
-					self.gameover1p()
+				if self.gameplan[2]:
+					if self.vie1 == 0:
+						self.gameover(2)
+					elif self.vie2 == 0:
+						self.gameover(1)
+			else:
+				if self.gameplan2[0]:
+					if pygame.time.get_ticks()-self.start_time > self.gameset2[0]:
+						self.gameover1p()
+				if self.gameplan2[1]:
+					if self.score >= self.gameset2[1]:
+						self.final_time = (pygame.time.get_ticks()-self.start_time)//1000
+						self.gameover1p()
+				if self.gameplan2[2]:
+					if self.vie1 == 0:
+						self.gameover1p()
 
-		if pygame.time.get_ticks() - self.startimer_flash < 25:
-			self.screen.blit(self.img_flash, (self.flashx, 0))
-		else:
-			self.startimer_flash = 0
+			if pygame.time.get_ticks() - self.startimer_flash < 25:
+				self.screen.blit(self.img_flash, (self.flashx, 0))
+			else:
+				self.startimer_flash = 0
 			
 	def verif_p1(self, k):
 		if self.game1[-1].k == k:

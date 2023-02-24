@@ -1,4 +1,4 @@
-Yaji-Rush ver 1.0.1
+Yaji-Rush ver 1.0.2
 
 pour démarer le jeu :
 	- Installer Python
