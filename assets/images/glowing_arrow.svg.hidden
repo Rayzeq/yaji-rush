@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-10 -10 148 148" width="56" height="56">
+  <defs>
+    <filter id="glow" height="300%" width="300%" x="-75%" y="-75%">
+      <!-- Thicken out the original shape -->
+      <feMorphology operator="dilate" radius="4" in="SourceAlpha" result="thicken" />
+      <!-- Use a gaussian blur to create the soft blurriness of the glow -->
+      <feGaussianBlur in="thicken" stdDeviation="10" result="blurred" />
+      <!-- Change the colour -->
+      <feFlood flood-color="rgb(255,255,255)" result="glowColor" />
+      <!-- Color in the glows -->
+      <feComposite in="glowColor" in2="blurred" operator="in" result="softGlow_colored" />
+      <!--  Layer the effects together -->
+      <feMerge>
+        <feMergeNode in="softGlow_colored" />
+        <feMergeNode in="SourceGraphic" />
+      </feMerge>
+    </filter>
+  </defs>
+  <polygon points="0,32 60,32 60,0 128,64 60,128 60,96 0,96" fill="${'{color}'}" transform="rotate(${{angle}},64,64)" filter="url(#glow)"></polygon>
+</svg>

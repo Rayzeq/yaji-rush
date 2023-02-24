@@ -15,3 +15,5 @@ class Player:
     lives: int = 0
     combo: int = 0
     arrows: list = field(default_factory=list)
+    doomed_by_satan: int = 0
+    gifted_by_god: int = 0
