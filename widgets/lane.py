@@ -36,6 +36,11 @@ class PlayerLane(Widget):
         else:
             self.display_lives = display_lives
 
+        self.doomed_cache = (0, None)
+        self.gifted_overlay = pygame.Surface((202, 576))
+        self.gifted_overlay.fill((255, 255, 255))
+        self.gifted_overlay.set_alpha(20)
+
     def draw_background(self, surface, lives=None):
         surface.blit(ASSETS.image.player_lane, (self.x, 0))
         surface.blit(ASSETS.image.template(
@@ -54,12 +59,15 @@ class PlayerLane(Widget):
         self.flash_time = pygame.time.get_ticks() + 25
 
     def key_pressed(self, direction):
-        failed = self.player.arrows[-1].pressed(self.player, direction)
-        if not failed:
-            self.player.arrows.pop()
-            self.player.arrows.insert(0, Arrow.get())
-        else:
-            self.flash()
+        if not (self.player.doomed_by_satan > pygame.time.get_ticks()):
+            failed = self.player.arrows[-1].pressed(self.player, direction)
+            if not failed:
+                if self.player.gifted_by_god > pygame.time.get_ticks():
+                    self.player.score += self.player.combo
+                self.player.arrows.pop()
+                self.player.arrows.insert(0, Arrow.get())
+            else:
+                self.flash()
 
     def draw(self, surface):
         for direction, pressed in self.pressed.items():
@@ -84,5 +92,20 @@ class PlayerLane(Widget):
         for i, arrow in enumerate(self.player.arrows):
             arrow.draw(surface, self.xleft, i * 48)
 
-        if self.flash_time > pygame.time.get_ticks():
+        if self.player.doomed_by_satan > pygame.time.get_ticks():
+            if self.doomed_cache[0] == self.player.doomed_by_satan:
+                surface.blit(self.doomed_cache[1], (self.x + 18, 0))
+            else:
+                s = surface.subsurface((self.x + 18, 0, 202, 576)).copy()
+                width, height = s.get_size()
+                for x in range(width):
+                    for y in range(height):
+                        red, green, blue, alpha = s.get_at((x, y))
+                        average = 0.3 * red + 0.59 * green + 0.11 * blue
+                        gs_color = (average, average, average, alpha)
+                        s.set_at((x, y), gs_color)
+                self.doomed_cache = (self.player.doomed_by_satan, s)
+        elif self.player.gifted_by_god > pygame.time.get_ticks():
+            surface.blit(self.gifted_overlay, (self.x + 18, 0))
+        elif self.flash_time > pygame.time.get_ticks():
             surface.blit(ASSETS.image.flash, (self.x - 25, 0))
