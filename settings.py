@@ -1,5 +1,5 @@
 from typing import Optional
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import pygame
 
@@ -15,9 +15,11 @@ class PlayerControls:
 @dataclass
 class Settings:
     p1_controls: PlayerControls = \
-        PlayerControls(pygame.K_q, pygame.K_z, pygame.K_s, pygame.K_d)
+        field(default_factory=lambda: PlayerControls(
+            pygame.K_q, pygame.K_z, pygame.K_s, pygame.K_d))
     p2_controls: PlayerControls = \
-        PlayerControls(pygame.K_KP4, pygame.K_KP8, pygame.K_KP5, pygame.K_KP6)
+        field(default_factory=lambda: PlayerControls(
+            pygame.K_KP4, pygame.K_KP8, pygame.K_KP5, pygame.K_KP6))
 
     # Used in custom solo and duel. If it's not None the game
     # will end after x seconds.
