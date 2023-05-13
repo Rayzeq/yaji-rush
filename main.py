@@ -1,7 +1,15 @@
 #!/usr/bin/env python3
 
-import pygame
-import scenes
+try:
+    import pygame
+    import scenes
+except ImportError:
+    import subprocess
+    print("Installation des programmes nécessaires...")
+    subprocess.run(["python", "-m", "pip", "install", "pygame", "numpy"])
+
+    import pygame
+    import scenes
 
 pygame.init()
 screen = pygame.display.set_mode((576, 576))
