@@ -124,7 +124,7 @@ class Game1p(Scene):
         score = self.player.score
         if self.mode == Mode.Score:
             score = (pygame.time.get_ticks() -
-                     self.start_time) // 1000
+                     self.start_time) / 1000
 
         if self.mode != Mode.Custom:
             SAVES.add(self.mode, score)

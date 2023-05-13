@@ -21,7 +21,7 @@ class SaveManager:
         if self.time_path.exists():
             with open(self.time_path, 'r') as f:
                 username, score = f.readlines()[-1].split("\t")
-                return username, int(score)
+                return username, int(score.strip())
         else:
             return None
 
@@ -30,7 +30,7 @@ class SaveManager:
         if self.score_path.exists():
             with open(self.score_path, 'r') as f:
                 username, score = f.readlines()[-1].split("\t")
-                return username, int(score)
+                return username, float(score.strip())
         else:
             return None
 
@@ -39,7 +39,7 @@ class SaveManager:
         if self.lives_path.exists():
             with open(self.lives_path, 'r') as f:
                 username, score = f.readlines()[-1].split("\t")
-                return username, int(score)
+                return username, int(score.strip())
         else:
             return None
 
